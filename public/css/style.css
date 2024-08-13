@@ -1,0 +1,64 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+}
+
+main {
+    padding: 2em;
+}
+
+#download-section {
+    text-align: center;
+    margin: 2em 0;
+}
+
+#download-btn {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 1em 2em;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#download-btn:hover {
+    background-color: #0056b3;
+}
+
+#images-section {
+    text-align: center;
+}
+
+.image-gallery {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.image-gallery img {
+    flex: 1 1 calc(50% - 10px); /* Default to 2 columns */
+    max-width: 40%;
+    height: auto;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Media Query for smaller screens */
+@media (max-width: 768px) {
+    .image-gallery img {
+        flex: 1 1 calc(100% - 10px); /* Change to 1 column */
+        max-width: 100%;
+    }
+}
