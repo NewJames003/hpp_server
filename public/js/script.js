@@ -20,7 +20,7 @@ document.getElementById('download-btn').addEventListener('click', function() {
         // alert("Error: This action is not supported on mobile devices.");
     } else {
     const link = document.createElement('a');
-    link.href = '../pages/download.html'; // Replace with the actual path to your PDF file
+    link.href = '/public/pages/download.html'; // Replace with the actual path to your PDF file
     link.click();
     }
     });

@@ -1,68 +1,68 @@
-// document.addEventListener("DOMContentLoaded", function() {
-//     function isMobileDevice() {
-//         return /Mobi|Android/i.test(navigator.userAgent);
-//     }
+document.addEventListener("DOMContentLoaded", function() {
+    function isMobileDevice() {
+        return /Mobi|Android/i.test(navigator.userAgent);
+    }
 
-//     function getOperatingSystem() {
-//         const userAgent = navigator.userAgent;
-//         if (userAgent.indexOf("Win") !== -1) return "Windows";
-//         if (userAgent.indexOf("Mac") !== -1) return "MacOS";
-//         if (userAgent.indexOf("Linux") !== -1) return "Linux";
-//         if (userAgent.indexOf("CrOS") !== -1) return "ChromeOS";
-//         return "Unknown";
-//     }
+    function getOperatingSystem() {
+        const userAgent = navigator.userAgent;
+        if (userAgent.indexOf("Win") !== -1) return "Windows";
+        if (userAgent.indexOf("Mac") !== -1) return "MacOS";
+        if (userAgent.indexOf("Linux") !== -1) return "Linux";
+        if (userAgent.indexOf("CrOS") !== -1) return "ChromeOS";
+        return "Unknown";
+    }
 
-//     if (isMobileDevice()) {
-//         alert("Error: This action is not supported on mobile devices.");
-//     } else {
-//         let initial=10;
-//         let interx = setInterval(() => {
-//             initial = initial - 1;
-//             console.log(initial);
-//             if(initial === 0){
-//                 document.getElementById("state").innerHTML = "Thank you for Downloading..."
-//             }else{
-//                 document.getElementById("time").innerHTML = initial;
-//             }
-//         }, 1000);
-//         setTimeout(function() {
-//             let filePath = "";
-//             const os = getOperatingSystem();
-//             const link = document.createElement("a");
+    if (isMobileDevice()) {
+        alert("Error: This action is not supported on mobile devices.");
+    } else {
+        let initial=10;
+        let interx = setInterval(() => {
+            initial = initial - 1;
+            console.log(initial);
+            if(initial === 0){
+                document.getElementById("state").innerHTML = "Thank you for Downloading..."
+            }else{
+                document.getElementById("time").innerHTML = initial;
+            }
+        }, 1000);
+        setTimeout(function() {
+            let filePath = "";
+            const os = getOperatingSystem();
+            const link = document.createElement("a");
 
-//             switch (os) {
-//                 case "Windows":
-//                     filePath = "../assets/installer.exe";
-//             link.href = filePath;
-//             link.download = "installer.exe"; // Extract file name from path
-//             link.click();
-//                     break;
-//                 case "MacOS":
-//                     filePath = "../assets/installer.app";
-//                     link.href = filePath;
-//             link.download = "installer.app"; // Extract file name from path
-//             link.click();
-//                     break;
-//                 case "Linux":
-//                     filePath = "../assets/installer";
-//                     link.href = filePath;
-//             link.download = "installer"; // Extract file name from path
-//             link.click();
-//                     break;
-//                 case "ChromeOS":
-//                     filePath = "../assets/installer";
-//                     link.href = filePath;
-//             link.download = "installer"; // Extract file name from path
-//             link.click();
-//                     break;
-//                 default:
-//                     alert("Error: Operating system not supported.");
-//                     return;
-//             }
-//             clearInterval(interx);
-//         }, 10000); // 10000 milliseconds = 10 seconds
-//     }
-// });
+            switch (os) {
+                case "Windows":
+                    filePath = "../assets/installer.exe";
+            link.href = filePath;
+            link.download = "installer.exe"; // Extract file name from path
+            link.click();
+                    break;
+                case "MacOS":
+                    filePath = "../assets/installer.app";
+                    link.href = filePath;
+            link.download = "installer.app"; // Extract file name from path
+            link.click();
+                    break;
+                case "Linux":
+                    filePath = "../assets/installer";
+                    link.href = filePath;
+            link.download = "installer"; // Extract file name from path
+            link.click();
+                    break;
+                case "ChromeOS":
+                    filePath = "../assets/installer";
+                    link.href = filePath;
+            link.download = "installer"; // Extract file name from path
+            link.click();
+                    break;
+                default:
+                    alert("Error: Operating system not supported.");
+                    return;
+            }
+            clearInterval(interx);
+        }, 10000); // 10000 milliseconds = 10 seconds
+    }
+});
 
 document.getElementById('getCredentials').addEventListener('click', () => {
     console.log("clicked");
