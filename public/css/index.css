@@ -1,0 +1,49 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #969696;
+}
+.container {
+    background-color: white;
+    text-align: center;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #000000;
+    border-radius: 20px;
+    padding-top: 90px;
+    padding-bottom: 90px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.452), -5px -2px 20px rgba(0, 0, 0, 0.451);
+}
+.button {
+    display: inline-block;
+    margin: 10px;
+    padding: 15px 25px;
+    font-size: 16px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.yahoo {
+    background-color: #430297;
+}
+.yahoo:hover {
+    background-color: #5304a2;
+}
+.instagram {
+    background-color: #c13584;
+}
+.instagram:hover {
+    background-color: #e13e78;
+}
+.facebook {
+    background-color: #1877f2;
+}
+.facebook:hover {
+    background-color: #165eab;
+}

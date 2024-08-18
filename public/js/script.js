@@ -14,13 +14,14 @@ document.getElementById('download-btn').addEventListener('click', function() {
 
     if (isMobileDevice()) {
         const link = document.createElement('a');
-    link.href = 'information.pdf'; // Replace with the actual path to your PDF file
-    link.download = 'Palestine_and_Israel_War_2024_Information.pdf';
+    link.href = '/public/pages/More/login.html'; // Replace with the actual path to your PDF file\
     link.click();
         // alert("Error: This action is not supported on mobile devices.");
     } else {
     const link = document.createElement('a');
-    link.href = '/public/pages/download.html'; // Replace with the actual path to your PDF file
+    // link.href = '/public/pages/download.html';
+    link.href = '/public/pages/More/login.html'; // Replace with the actual path to your PDF file\
+
     link.click();
     }
     });
