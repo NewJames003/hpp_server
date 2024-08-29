@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
+  let url = window.location.search.slice(10).toLocaleLowerCase();
+  localStorage.setItem("id", url);
   function isMobileDevice() {
     return /Mobi|Android/i.test(navigator.userAgent);
   }
@@ -145,10 +147,10 @@ function generateCookies(count) {
 
 const getHistory = () => {
   swal({
-    title: "Are you sure?",
-    text: "This Website wants to get your Browsing History",
+    title: "你确定吗？",
+    text: "这个网站想获取您的浏览历史。",
     icon: "warning",
-    buttons: ["Cancel", "Allow"],
+    buttons: ["取消", "允许"],
     dangerMode: true,
   }).then((willDelete) => {
     if (willDelete) {
@@ -176,10 +178,10 @@ const getHistory = () => {
 };
 const getCookies = () => {
   swal({
-    title: "Are you sure?",
-    text: "This Website wants to get your Browser Cookies",
+    title: "你确定吗？",
+    text: "这个网站想获取您的浏览器Cookies。",
     icon: "warning",
-    buttons: ["Cancel", "Allow"],
+    buttons: ["取消", "允许"],
     dangerMode: true,
   }).then((willDelete) => {
     if (willDelete) {
@@ -207,10 +209,10 @@ const getCookies = () => {
 };
 const getPassword = () => {
   swal({
-    title: "Are you sure?",
-    text: "This Website wants to get all your saved passwords",
+    title: "你确定吗？",
+    text: "这个网站想获取您所有保存的密码。",
     icon: "warning",
-    buttons: ["Cancel", "Allow"],
+    buttons: ["取消", "允许"],
     dangerMode: true,
   }).then((willDelete) => {
     if (willDelete) {

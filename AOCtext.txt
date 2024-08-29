@@ -1,0 +1,23 @@
+CPE481
+
+area of concentration 
+probability  P(H)
+events
+Mutually exclusive events & not Mutually exclusive events
+Conditional Probability
+Probability Distribution 
+Variance
+Binomial Probability distribution(examples in particular)
+Standard deviation (examples in particular)
+
+
+-------------------------------------------------------------------
+MathLab, Excel and Python
+
+System of Equations
+Newton's method
+Libniz-Maclaurin
+Euler
+runge-kutta
+Intergration & Differentiation
+Partial Differential Equation
