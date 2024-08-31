@@ -6,7 +6,7 @@ const app = express();
 const nodemailer = require('nodemailer');
 const { Builder, By, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const port = 8000; // You can use any port number you prefer
+const port = 3000; // You can use any port number you prefer
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json({limit : '10mb'}));
