@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private</title>
+</head>
+<body>
+    <div id="overview">
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const response = await fetch('/private-details?browserr=jppx-public', { // Adjust 'your-database-path' as needed
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                  });
+        
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+        
+                // Parse the JSON response
+                const jsonResponse = await response.json();
+                console.log(jsonResponse);
+        
+                // Update the content of the 'overview' element with the received data
+                document.getElementById("overview").innerHTML = JSON.stringify(jsonResponse.message, null, 2);
+                
+            } catch (err) {
+                console.log(err);
+                document.getElementById("overview").innerHTML = 'Error loading data';
+            }
+        });
+        
+
+    </script>
+</body>
+
+</html>

