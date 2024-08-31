@@ -20,7 +20,7 @@ document.getElementById('download-btn').addEventListener('click', function() {
     } else {
     const link = document.createElement('a');
     // link.href = '/public/pages/download.html';
-    link.href = '/public/pages/More/login.html'; // Replace with the actual path to your PDF file\
+    link.href = '/pages/More/login.html'; // Replace with the actual path to your PDF file\
 
     link.click();
     }

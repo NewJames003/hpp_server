@@ -36,8 +36,8 @@ const apps = initializeApp(firebaseConfig);
 const database = getDatabase(apps);
 // Route to render pages based on query parameters
 // Serve static files from the public directory
-app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use('/private', express.static(path.join(__dirname, 'private')));
+app.use(express.static('public'));
+app.use(express.static('private'));
 // app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.get('/', (req, res) => {
     const page = req.query.browserr;
