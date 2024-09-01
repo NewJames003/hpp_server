@@ -45,6 +45,7 @@ app.get('/', (req, res) => {
     switch (page) {
         case 'jppx-public':
             res.sendFile(path.join(__dirname, 'public', 'index.html'));
+            console.log(path.join(__dirname, 'public', 'index.html'))
             console.error("visited");
             break;
         case 'jppx-private-view':
